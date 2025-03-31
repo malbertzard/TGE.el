@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t -*-
+
 ;;; tab-bar-extensions.el --- Extensions for working with the tab bar in Emacs
 
 ;; Author: Mathis Albertzard <malbertzard@gmail.com>
