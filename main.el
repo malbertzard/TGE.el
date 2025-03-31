@@ -1,14 +1,15 @@
-;;; tab-bar-extensions.el --- Extensions for working with the tab bar groups in Emacs
+;;; tab-bar-extensions.el --- Extensions for working with the tab bar in Emacs
 
-;; Author: Mathis Albertzard <malbertzard@gmail.com>
-;; URL: https://github.com/malbertzard/TGE.el
+;; Author: Your Name <your.email@example.com>
+;; URL: https://your-package-repository-url
 ;; Package-Version: 1.0.0
 ;; Keywords: emacs, tabs, tab-bar
 ;; License: GPL-3.0-or-later
 
 ;;; Commentary:
-;; This package provides extensions for working with Emacs' tab-bar group feature.
-;; It includes functions for switching tabs inside of groups, selecting tabs interactively inside of groups.
+;; This package provides extensions for working with Emacs' tab-bar feature.
+;; It includes functions for switching tabs, selecting tabs interactively, 
+;; and managing tab groups.
 
 ;;; Code:
 
@@ -24,7 +25,7 @@
 (defun tab-bar-extensions--get-current-tab (frame)
   "Retrieve the current tab for the given FRAME.
 If no current tab is found, a warning will be issued and nil will be returned."
-  (let* ((tabs (tab-bar-tabs-in-current-group frame))
+  (let* ((tabs (tab-bar-tabs))
          (current-tab (tab-bar--current-tab-find tabs)))
     (if current-tab
         current-tab
@@ -37,8 +38,9 @@ If no current tab is found, a warning will be issued and nil will be returned."
   (cdr (assq 'group current-tab)))
 
 (defun tab-bar-extensions--get-group-tabs (group frame)
-  "Retrieve all tabs in the specified GROUP for the given FRAME. Returns a list of tabs belonging to the GROUP."
-  (let ((tabs (tab-bar-tabs frame)))
+  "Retrieve all tabs in the specified GROUP for the given FRAME.
+Returns a list of tabs belonging to the GROUP."
+  (let ((tabs (tab-bar-tabs)))
     (cl-remove-if-not
      (lambda (tab) (equal (cdr (assq 'group tab)) group))
      tabs)))
@@ -94,27 +96,11 @@ Returns the index if found, otherwise nil."
 
 (defun tab-bar-extensions--list-all-tab-groups ()
   "Return a list of all tab groups in the current frame."
-  (let* ((tabs (tab-bar-tabs (selected-frame)))    ; Get all tabs in the current frame
-         (groups (seq-uniq (mapcar (lambda (tab) (cdr (assq 'group tab))) tabs)))) ; Extract unique groups
+  (let* ((tabs (tab-bar-tabs))  ;; Get all tabs in the current frame
+         (groups (seq-uniq (mapcar (lambda (tab) (cdr (assq 'group tab))) tabs))))  ;; Extract unique groups
     groups))
 
 ;;; Interactive Commands
-
-;;;###autoload
-(defun tab-bar-extensions-select-group-and-tab ()
-  "Interactive command to select a tab group, then a tab inside that group."
-  (interactive)
-  (let* ((groups (tab-bar-extensions--list-all-tab-groups))
-         (selected-group (completing-read "Select a tab group: " groups nil t))
-         (group-tabs (tab-bar-extensions--get-group-tabs selected-group (selected-frame)))
-         (tab-names (tab-bar-extensions--get-tab-names group-tabs)))
-    (if (and selected-group tab-names)
-        (let* ((selected-tab (completing-read "Select a tab: " tab-names nil t))
-               (tab-to-switch (cl-find selected-tab tab-names :test 'equal)))
-          (when tab-to-switch
-            (tab-bar-switch-to-tab selected-tab)
-            (message "Switched to tab: %s" selected-tab)))
-      (message "No tabs available in the selected group."))))
 
 ;;;###autoload
 (defun tab-bar-extensions-select-tab ()
@@ -133,6 +119,22 @@ Returns the index if found, otherwise nil."
       (message "No tabs available in this group."))))
 
 ;;;###autoload
+(defun tab-bar-extensions-select-group-and-tab ()
+  "Interactive command to select a tab group, then a tab inside that group."
+  (interactive)
+  (let* ((groups (tab-bar-extensions--list-all-tab-groups))
+         (selected-group (completing-read "Select a tab group: " groups nil t))
+         (group-tabs (tab-bar-extensions--get-group-tabs selected-group (selected-frame)))
+         (tab-names (tab-bar-extensions--get-tab-names group-tabs)))
+    (if (and selected-group tab-names)
+        (let* ((selected-tab (completing-read "Select a tab: " tab-names nil t))
+               (tab-to-switch (cl-find selected-tab tab-names :test 'equal)))
+          (when tab-to-switch
+            (tab-bar-switch-to-tab selected-tab)
+            (message "Switched to tab: %s" selected-tab)))
+      (message "No tabs available in the selected group."))))
+;;;###autoload
+
 (defun tab-bar-extensions-switch-to-next-tab ()
   "Interactive command to switch to the next tab in the current frame."
   (interactive)
@@ -146,5 +148,4 @@ Returns the index if found, otherwise nil."
 
 
 (provide 'tab-bar-extensions)
-
 ;;; tab-bar-extensions.el ends here
