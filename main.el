@@ -90,19 +90,29 @@ Returns the index if found, otherwise nil."
         (cdr (assq 'name group))
       "No group")))
 
+(defun tab-bar-extensions--list-all-tab-groups ()
+  "Return a list of all tab groups in the current frame."
+  (let* ((tabs (tab-bar-tabs (selected-frame)))    ; Get all tabs in the current frame
+         (groups (seq-uniq (mapcar (lambda (tab) (cdr (assq 'group tab))) tabs)))) ; Extract unique groups
+    groups))
+
 ;;; Interactive Commands
 
 ;;;###autoload
-(defun tab-bar-extensions-switch-to-next-tab ()
-  "Interactive command to switch to the next tab in the current frame."
+(defun tab-bar-extensions-select-group-and-tab ()
+  "Interactive command to select a tab group, then a tab inside that group."
   (interactive)
-  (tab-bar-extensions--switch-to-next-tab (selected-frame)))
-
-;;;###autoload
-(defun tab-bar-extensions-switch-to-previous-tab ()
-  "Interactive command to switch to the previous tab in the current frame."
-  (interactive)
-  (tab-bar-extensions--switch-to-previous-tab (selected-frame)))
+  (let* ((groups (tab-bar-extensions--list-all-tab-groups))
+         (selected-group (completing-read "Select a tab group: " groups nil t))
+         (group-tabs (tab-bar-extensions--get-group-tabs selected-group (selected-frame)))
+         (tab-names (tab-bar-extensions--get-tab-names group-tabs)))
+    (if (and selected-group tab-names)
+        (let* ((selected-tab (completing-read "Select a tab: " tab-names nil t))
+               (tab-to-switch (cl-find selected-tab tab-names :test 'equal)))
+          (when tab-to-switch
+            (tab-bar-switch-to-tab selected-tab)
+            (message "Switched to tab: %s" selected-tab)))
+      (message "No tabs available in the selected group."))))
 
 ;;;###autoload
 (defun tab-bar-extensions-select-tab ()
@@ -119,6 +129,18 @@ Returns the index if found, otherwise nil."
             (tab-bar-switch-to-tab selected-tab)
             (message "Switched to tab: %s" selected-tab)))
       (message "No tabs available in this group."))))
+
+;;;###autoload
+(defun tab-bar-extensions-switch-to-next-tab ()
+  "Interactive command to switch to the next tab in the current frame."
+  (interactive)
+  (tab-bar-extensions--switch-to-next-tab (selected-frame)))
+
+;;;###autoload
+(defun tab-bar-extensions-switch-to-previous-tab ()
+  "Interactive command to switch to the previous tab in the current frame."
+  (interactive)
+  (tab-bar-extensions--switch-to-previous-tab (selected-frame)))
 
 
 (provide 'tab-bar-extensions)
