@@ -37,9 +37,11 @@ If no current tab is found, a warning will be issued and nil will be returned."
   (cdr (assq 'group current-tab)))
 
 (defun tab-bar-extensions--get-group-tabs (group frame)
-  "Retrieve all tabs in the specified GROUP for the given FRAME.
-Returns a list of tabs belonging to the GROUP."
-  (tab-bar-tabs-in-group group frame))
+  "Retrieve all tabs in the specified GROUP for the given FRAME. Returns a list of tabs belonging to the GROUP."
+  (let ((tabs (tab-bar-tabs frame)))
+    (cl-remove-if-not
+     (lambda (tab) (equal (cdr (assq 'group tab)) group))
+     tabs)))
 
 (defun tab-bar-extensions--get-tab-names (group-tabs)
   "Return a list of tab names from GROUP-TABS."
