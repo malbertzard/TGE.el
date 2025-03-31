@@ -1,3 +1,17 @@
+;;; tab-bar-extensions.el --- Extensions for working with the tab bar groups in Emacs
+
+;; Author: Mathis Albertzard <malbertzard@gmail.com>
+;; URL: https://github.com/malbertzard/TGE.el
+;; Package-Version: 1.0.0
+;; Keywords: emacs, tabs, tab-bar
+;; License: GPL-3.0-or-later
+
+;;; Commentary:
+;; This package provides extensions for working with Emacs' tab-bar group feature.
+;; It includes functions for switching tabs inside of groups, selecting tabs interactively inside of groups.
+
+;;; Code:
+
 (defgroup tab-bar-extensions nil
   "Extensions for working with the tab bar in Emacs."
   :group 'tools)
@@ -78,16 +92,19 @@ Returns the index if found, otherwise nil."
 
 ;;; Interactive Commands
 
+;;;###autoload
 (defun tab-bar-extensions-switch-to-next-tab ()
   "Interactive command to switch to the next tab in the current frame."
   (interactive)
   (tab-bar-extensions--switch-to-next-tab (selected-frame)))
 
+;;;###autoload
 (defun tab-bar-extensions-switch-to-previous-tab ()
   "Interactive command to switch to the previous tab in the current frame."
   (interactive)
   (tab-bar-extensions--switch-to-previous-tab (selected-frame)))
 
+;;;###autoload
 (defun tab-bar-extensions-select-tab ()
   "Interactive command to select a tab inside the current group."
   (interactive)
@@ -106,4 +123,4 @@ Returns the index if found, otherwise nil."
 
 (provide 'tab-bar-extensions)
 
-
+;;; tab-bar-extensions.el ends here
