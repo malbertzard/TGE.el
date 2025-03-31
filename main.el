@@ -1,7 +1,7 @@
 ;;; tab-bar-extensions.el --- Extensions for working with the tab bar in Emacs
 
-;; Author: Your Name <your.email@example.com>
-;; URL: https://your-package-repository-url
+;; Author: Mathis Albertzard <malbertzard@gmail.com>
+;; URL: https://github.com/malbertzard/TGE
 ;; Package-Version: 1.0.0
 ;; Keywords: emacs, tabs, tab-bar
 ;; License: GPL-3.0-or-later
