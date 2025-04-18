@@ -27,11 +27,6 @@
   :type 'string
   :group 'tab-bar-extensions)
 
-(defcustom tab-bar-extensions-prefix-key (kbd "C-c W")
-  "Prefix key for `tab-bar-extensions-mode` keybindings."
-  :type 'key-sequence
-  :group 'tab-bar-extensions)
-
 (defcustom tab-bar-extensions-default-group-name "Default"
   "Name used for tabs that don't belong to any group."
   :type 'string
@@ -155,16 +150,6 @@ Tabs without a group are grouped under `tab-bar-extensions-default-group-name`."
   "Interactive command to switch to the previous tab."
   (interactive)
   (tab-bar-extensions--switch-to-previous-tab))
-
-;;;###autoload
-(defvar tab-bar-extensions-mode-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "n") #'tab-bar-extensions-switch-to-next-tab)
-    (define-key map (kbd "p") #'tab-bar-extensions-switch-to-previous-tab)
-    (define-key map (kbd "s") #'tab-bar-extensions-select-tab)
-    (define-key map (kbd "g") #'tab-bar-extensions-select-group-and-tab)
-    map)
-  "Keymap for `tab-bar-extensions-mode`.")
 
 ;;;###autoload
 (define-minor-mode tab-bar-extensions-mode
