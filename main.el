@@ -27,9 +27,14 @@
   :type 'string
   :group 'tab-bar-extensions)
 
-(defcustom tab-bar-extensions-prefix-key (kbd "C-c t")
+(defcustom tab-bar-extensions-prefix-key (kbd "C-c W")
   "Prefix key for `tab-bar-extensions-mode` keybindings."
   :type 'key-sequence
+  :group 'tab-bar-extensions)
+
+(defcustom tab-bar-extensions-default-group-name "Default"
+  "Name used for tabs that don't belong to any group."
+  :type 'string
   :group 'tab-bar-extensions)
 
 (defun tab-bar-extensions--get-current-tab (&optional frame)
@@ -42,13 +47,17 @@
           nil))))
 
 (defun tab-bar-extensions--get-current-group (current-tab)
-  "Retrieve the group associated with CURRENT-TAB."
-  (cdr (assq 'group current-tab)))
+  "Retrieve the group name associated with CURRENT-TAB."
+  (or (cdr (assq 'group current-tab))
+      tab-bar-extensions-default-group-name))
 
 (defun tab-bar-extensions--get-group-tabs (group tabs)
-  "Return tabs from TABS that belong to GROUP."
+  "Return tabs from TABS that belong to GROUP.
+Tabs without a group are included under `tab-bar-extensions-default-group-name`."
   (seq-filter
-   (lambda (tab) (equal (cdr (assq 'group tab)) group))
+   (lambda (tab)
+     (let ((tab-group (or (cdr (assq 'group tab)) tab-bar-extensions-default-group-name)))
+       (equal tab-group group)))
    tabs))
 
 (defun tab-bar-extensions--get-tab-names (group-tabs)
@@ -94,14 +103,16 @@
   "Return name of the current tab group."
   (let* ((current-tab (tab-bar-extensions--get-current-tab))
          (group (tab-bar-extensions--get-current-group current-tab)))
-    (if group
-        (cdr (assq 'name group))
-      "No group")))
+    group))
 
 (defun tab-bar-extensions--list-all-tab-groups ()
-  "Return a list of all tab groups in the current frame."
-  (let* ((tabs (tab-bar-tabs)))
-    (seq-uniq (mapcar (lambda (tab) (cdr (assq 'group tab))) tabs))))
+  "Return a list of all tab groups in the current frame.
+Tabs without a group are grouped under `tab-bar-extensions-default-group-name`."
+  (let* ((tabs (tab-bar-tabs))
+         (groups (mapcar (lambda (tab)
+                           (or (cdr (assq 'group tab)) tab-bar-extensions-default-group-name))
+                         tabs)))
+    (seq-uniq groups)))
 
 ;;; Interactive Commands
 
@@ -124,7 +135,7 @@
   "Select a group, then a tab from that group."
   (interactive)
   (let* ((tabs (tab-bar-tabs))
-         (groups (seq-uniq (mapcar (lambda (tab) (cdr (assq 'group tab))) tabs)))
+         (groups (tab-bar-extensions--list-all-tab-groups))
          (selected-group (completing-read "Select a tab group: " groups nil t))
          (group-tabs (tab-bar-extensions--get-group-tabs selected-group tabs))
          (tab-names (tab-bar-extensions--get-tab-names group-tabs)))
