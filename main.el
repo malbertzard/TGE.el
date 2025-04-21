@@ -34,12 +34,11 @@
 
 (defun tab-bar-extensions--get-current-tab (&optional frame)
   "Retrieve the current tab for FRAME, defaulting to `selected-frame`."
-  (let* ((tabs (tab-bar-tabs frame))
-         (current-tab (tab-bar--current-tab-find tabs)))
-    (or current-tab
-        (progn
-          (warn "No current tab found in the specified frame.")
-          nil))))
+  (pcase (tab-bar--current-tab-find (tab-bar-tabs frame))
+    (`nil
+     (warn "No current tab found in the specified frame.")
+     nil)
+    (tab tab)))
 
 (defun tab-bar-extensions--get-current-group (current-tab)
   "Retrieve the group name associated with CURRENT-TAB."
@@ -76,10 +75,10 @@ Tabs without a group are included under `tab-bar-extensions-default-group-name`.
          (group-tabs (tab-bar-extensions--get-group-tabs group tabs))
          (tab-names (tab-bar-extensions--get-tab-names group-tabs))
          (current-name (cdr (assq 'name current-tab)))
-         (current-index (tab-bar-extensions--find-tab-index tab-names current-name))
-         (next-index (mod (+ current-index 1) (length tab-names))))
-    (when (and tab-names current-index)
-      (tab-bar-extensions--switch-to-tab (nth next-index tab-names)))))
+         (current-index (tab-bar-extensions--find-tab-index tab-names current-name)))
+    (when (and tab-names (not (null tab-names)) current-index)
+      (let ((next-index (mod (+ current-index 1) (length tab-names))))
+        (tab-bar-extensions--switch-to-tab (nth next-index tab-names))))))
 
 (defun tab-bar-extensions--switch-to-previous-tab (&optional frame)
   "Switch to the previous tab in FRAME."
@@ -89,10 +88,10 @@ Tabs without a group are included under `tab-bar-extensions-default-group-name`.
          (group-tabs (tab-bar-extensions--get-group-tabs group tabs))
          (tab-names (tab-bar-extensions--get-tab-names group-tabs))
          (current-name (cdr (assq 'name current-tab)))
-         (current-index (tab-bar-extensions--find-tab-index tab-names current-name))
-         (prev-index (mod (- current-index 1) (length tab-names))))
-    (when (and tab-names current-index)
-      (tab-bar-extensions--switch-to-tab (nth prev-index tab-names)))))
+         (current-index (tab-bar-extensions--find-tab-index tab-names current-name)))
+    (when (and tab-names (not (null tab-names)) current-index)
+      (let ((prev-index (mod (- current-index 1) (length tab-names))))
+        (tab-bar-extensions--switch-to-tab (nth prev-index tab-names))))))
 
 (defun tab-bar-extensions-get-current-group-name ()
   "Return name of the current tab group."
@@ -155,10 +154,7 @@ Tabs without a group are grouped under `tab-bar-extensions-default-group-name`."
 (define-minor-mode tab-bar-extensions-mode
   "Global minor mode for tab-bar-extensions keybindings."
   :global t
-  :lighter " TBE"
-  :keymap (let ((prefix-map (make-sparse-keymap)))
-            (define-key prefix-map tab-bar-extensions-prefix-key tab-bar-extensions-mode-map)
-            prefix-map))
+  :lighter "TBE")
 
 (provide 'tab-bar-extensions)
 
