@@ -55,6 +55,7 @@ Enhance your Emacs experience with smarter tab switching, tab grouping, and inte
     (define-key map (kbd "p") #'tab-bar-extensions-switch-to-previous-tab)
     (define-key map (kbd "s") #'tab-bar-extensions-select-tab)
     (define-key map (kbd "g") #'tab-bar-extensions-select-group-and-tab)
+    (define-key map (kbd "d") #'tab-bar-extensions-delete-group-tabs)
     map)
   "Keymap for tab-bar-extensions commands.")
   
@@ -73,3 +74,4 @@ This example binds all commands to the `C-c W` prefix key.
 | `tab-bar-extensions-switch-to-previous-tab` | Switch to previous tab in the current group |
 | `tab-bar-extensions-select-tab`             | Interactively select a tab from the current group |
 | `tab-bar-extensions-select-group-and-tab`   | Select a group first, then a tab |
+| `tab-bar-extensions-delete-group-tabs`      | Delete a tab group and all tabs within |

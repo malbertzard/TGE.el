@@ -54,6 +54,14 @@ Tabs without a group are included under `tab-bar-extensions-default-group-name`.
        (equal tab-group group)))
    tabs))
 
+(defun tab-bar-extensions--delete-group-tabs (group)
+  "Delete all tabs in the tab group GROUP."
+  (let* ((tabs (tab-bar-tabs))
+         (group-tabs (tab-bar-extensions--get-group-tabs group tabs)))
+    (dolist (tab group-tabs)
+      (let ((name (cdr (assq 'name tab))))
+        (tab-bar-close-tab-by-name name)))))
+
 (defun tab-bar-extensions--get-tab-names (group-tabs)
   "Return a list of tab names from GROUP-TABS."
   (mapcar (lambda (tab) (cdr (assq 'name tab))) group-tabs))
@@ -143,6 +151,17 @@ Tabs without a group are grouped under `tab-bar-extensions-default-group-name`."
   "Interactive command to switch to the next tab."
   (interactive)
   (tab-bar-extensions--switch-to-next-tab))
+
+;;;###autoload
+(defun tab-bar-extensions-delete-group-tabs ()
+  "Interactively select a group and delete all tabs in that group."
+  (interactive)
+  (let* ((groups (tab-bar-extensions--list-all-tab-groups))
+         (selected-group (completing-read "Select tab group to delete: " groups nil t)))
+    (when (yes-or-no-p (format "Really delete all tabs in group '%s'?" selected-group))
+      (tab-bar-extensions--delete-group-tabs selected-group)
+      (message "Deleted all tabs in group '%s'" selected-group))))
+
 
 ;;;###autoload
 (defun tab-bar-extensions-switch-to-previous-tab ()
