@@ -75,3 +75,5 @@ This example binds all commands to the `C-c W` prefix key.
 | `tab-bar-extensions-select-tab`             | Interactively select a tab from the current group |
 | `tab-bar-extensions-select-group-and-tab`   | Select a group first, then a tab |
 | `tab-bar-extensions-delete-group-tabs`      | Delete a tab group and all tabs within |
+| `tab-bar-extensions-delete-some-tab-groups` | Delete some tab groups |
+| `tab-bar-extensions-delete-other-tab-groups`| Delete all tab groups except the current one |
