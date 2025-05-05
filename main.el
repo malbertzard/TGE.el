@@ -170,6 +170,32 @@ Tabs without a group are grouped under `tab-bar-extensions-default-group-name`."
   (tab-bar-extensions--switch-to-previous-tab))
 
 ;;;###autoload
+(defun tab-bar-extensions-delete-some-tab-groups ()
+  "Interactively go through all tab groups and ask whether to delete them."
+  (interactive)
+  (let ((groups (tab-bar-extensions--list-all-tab-groups)))
+    (dolist (group groups)
+      (when (yes-or-no-p (format "Delete all tabs in group '%s'? " group))
+        (tab-bar-extensions--delete-group-tabs group)
+        (message "Deleted all tabs in group '%s'" group)))))
+
+;;;###autoload
+(defun tab-bar-extensions-delete-other-tab-groups ()
+  "Delete all tab groups except the current one."
+  (interactive)
+  (let* ((current-tab (tab-bar-extensions--get-current-tab))
+         (current-group (tab-bar-extensions--get-current-group current-tab))
+         (all-groups (tab-bar-extensions--list-all-tab-groups))
+         (other-groups (seq-remove (lambda (group)
+                                     (equal group current-group))
+                                   all-groups)))
+    (when (yes-or-no-p
+           (format "Really delete all tabs except those in group '%s'? " current-group))
+      (dolist (group other-groups)
+        (tab-bar-extensions--delete-group-tabs group))
+      (message "Deleted all tabs in groups other than '%s'" current-group))))
+
+;;;###autoload
 (define-minor-mode tab-bar-extensions-mode
   "Global minor mode for tab-bar-extensions keybindings."
   :global t
