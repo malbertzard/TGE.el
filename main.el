@@ -25,7 +25,7 @@
 (defcustom tab-group-extensions-next-tab-message "Switched to tab: %s"
   "Message displayed when switching to a tab."
   :type 'string
-  :group 'tab-bar-extensions)
+  :group 'tab-group-extensions)
 
 (defcustom tab-group-extensions-default-group-name "Default"
   "Name used for tabs that don't belong to any group."
@@ -168,6 +168,16 @@ Tabs without a group are grouped under `tab-group-extensions-default-group-name`
   "Interactive command to switch to the previous tab."
   (interactive)
   (tab-group-extensions--switch-to-previous-tab))
+
+;;;###autoload
+(defun tab-group-extensions-delete-current-group ()
+  "Delete all tabs in the current tab group."
+  (interactive)
+  (let* ((current-tab (tab-group-extensions--get-current-tab))
+         (current-group (tab-group-extensions--get-current-group current-tab)))
+    (when (yes-or-no-p (format "Really delete all tabs in current group '%s'? " current-group))
+      (tab-group-extensions--delete-group-tabs current-group)
+      (message "Deleted all tabs in group '%s'" current-group))))
 
 ;;;###autoload
 (defun tab-group-extensions-delete-some-tab-groups ()
